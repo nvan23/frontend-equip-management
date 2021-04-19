@@ -28,6 +28,7 @@ export function authReducer (state, action) {
       return {
         ...state,
         user: null,
+        token: null,
       }
 
     default:

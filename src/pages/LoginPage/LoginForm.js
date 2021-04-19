@@ -3,7 +3,10 @@ import { Link, useHistory } from 'react-router-dom';
 
 import { useStore } from '../../context/storeProvider';
 import { SET_USER } from '../../context/auth'
-import { setToken } from '../../utils/localStorage'
+import {
+  setToken,
+  setRefreshToken,
+} from '../../utils/localStorage'
 
 import { login } from '../../resolvers/auth.resolver'
 
@@ -37,12 +40,13 @@ const LoginForm = () => {
           payload: response.data
         });
         setToken(response.data.token)
-
+        setRefreshToken(response.data.refreshToken)
         history.push('/profile')
       })
       .catch((error) => {
-        console.log(error);
-        message.error('Failed when trying log in')
+        error.response.status === 404
+          ? message.error(error.response.data.msg)
+          : message.error('Failed when trying log in')
       })
 
   };

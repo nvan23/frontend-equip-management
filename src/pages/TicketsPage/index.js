@@ -17,7 +17,7 @@ const TicketPage = () => {
   const [tickets, setTickets] = useState([])
 
   useEffect(() => {
-    getAllTickets().then(res => setTickets(res)).catch(err => message.error(err))
+    getAllTickets().then(res => setTickets(res))
   }, [])
 
   return (

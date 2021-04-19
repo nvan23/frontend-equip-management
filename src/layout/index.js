@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
-import { useStore } from '../context/storeProvider';
-import { getToken } from '../utils/localStorage'
-import { getUser } from '../resolvers/auth.resolver'
-import { SET_USER } from '../context/auth'
+import { useStore } from '../context/storeProvider'
+import { getToken, removeToken } from '../utils/localStorage'
+import { getUser, isJwtExpired } from '../resolvers/auth.resolver'
+import { SET_USER, REMOVE_USER } from '../context/auth'
+import { applyInterceptors } from '../services/axios'
 
 import { Layout, Breadcrumb } from 'antd'
 
@@ -25,6 +26,7 @@ import TicketsTrashPage from '../pages/TicketsTrashPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 import Nav from './Nav'
+import RequestLogin from '../components/RequestLogin'
 
 const LayoutContent = styled.div`
   padding: 24px;
@@ -38,7 +40,14 @@ const AppLayout = () => {
   const [{ auth }, dispatch] = useStore()
 
   useEffect(() => {
-    if (getToken()) {
+    // applyInterceptors()
+    if (isJwtExpired()) {
+      dispatch({
+        type: REMOVE_USER,
+      })
+      return <RequestLogin />
+
+    } else {
       getUser()
         .then(response => {
           dispatch({
@@ -53,55 +62,64 @@ const AppLayout = () => {
           console.log(error)
         })
     }
-  }, [dispatch])
+  }, [])
 
   return (
-    <Layout>
+    <>
+      <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Header */}
-      <Header
-        style={{
-          position: 'fixed',
-          zIndex: 10,
-          width: '100%',
-          backgroundColor: '#fff'
-        }}
-      >
-        <Nav user={auth.user} />
-      </Header>
 
-      {/* Container */}
-      <Container>
+        {/* Header */}
+        <Header
+          style={{
+            width: '100%',
+            backgroundColor: '#fff'
+          }}
+        >
+          <Nav user={auth.user} />
+        </Header>
 
-        <Content style={{ marginTop: 80 }}>
+        {/* Container */}
 
-          <Breadcrumb style={{ margin: '16px' }}>
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            <Breadcrumb.Item>App</Breadcrumb.Item>
-          </Breadcrumb>
+        <Content style={{ flex: 1 }}>
+          <Container>
 
-          <LayoutContent>
-            <Switch>
-              <Route exact path="/todos" component={TodosPage} />
-              <Route exact path="/login" component={LoginPage} />
-              <Route exact path="/register" component={RegisterPage} />
-              <PrivateRoute exact path="/profile" component={ProfilePage} />
-              <PrivateRoute exact path="/equipments" component={EquipmentsPage} />
-              <PrivateRoute exact path="/trash/equipments" component={EquipmentTrashPage} />
-              <PrivateRoute exact path="/tickets" component={TicketsPage} />
-              <PrivateRoute exact path="/trash/tickets" component={TicketsTrashPage} />
-              <Route exact path="/" component={HomePage} />
-              <Route path="/" component={NotFoundPage} />
-            </Switch>
-          </LayoutContent>
+            <Breadcrumb style={{ margin: '16px' }}>
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>List</Breadcrumb.Item>
+              <Breadcrumb.Item>App</Breadcrumb.Item>
+            </Breadcrumb>
 
+            <LayoutContent>
+              <Switch>
+                <Route exact path="/todos" component={TodosPage} />
+                <Route exact path="/login" component={LoginPage} />
+                <Route exact path="/register" component={RegisterPage} />
+                <PrivateRoute exact path="/profile" component={ProfilePage} />
+                <PrivateRoute exact path="/equipments" component={EquipmentsPage} />
+                <PrivateRoute exact path="/trash/equipments" component={EquipmentTrashPage} />
+                <PrivateRoute exact path="/tickets" component={TicketsPage} />
+                <PrivateRoute exact path="/trash/tickets" component={TicketsTrashPage} />
+                <Route exact path="/" component={HomePage} />
+                <Route path="/" component={NotFoundPage} />
+              </Switch>
+            </LayoutContent>
+
+          </Container>
         </Content>
-      </Container>
 
-      {/* Footer */}
-      <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
-    </Layout>
+        {/* Footer */}
+        <Footer
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            backgroundColor: '#fff',
+          }}
+        >
+          Ant Design ©2018 Created by Ant UED
+        </Footer>
+      </Layout>
+    </>
   );
 }
 

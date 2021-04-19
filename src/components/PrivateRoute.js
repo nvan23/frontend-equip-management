@@ -1,7 +1,9 @@
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
 import { useStore } from '../context/storeProvider'
+
+import RequestLogin from '../components/RequestLogin'
 
 import {
   setCurrentPath
@@ -18,7 +20,8 @@ export const PrivateRoute = ({ component: Component, ...rest }) => {
     <Route {...rest} render={props => (
       auth.user
         ? < Component {...props} />
-        : <Redirect to='login' />
-    )} />
+        : <RequestLogin />
+    )
+    } />
   )
 }

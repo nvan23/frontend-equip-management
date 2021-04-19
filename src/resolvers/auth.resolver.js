@@ -1,6 +1,9 @@
-import { message } from "antd"
-import { getToken } from '../utils/localStorage'
+
 import axios from 'axios'
+import jwt from 'jsonwebtoken'
+
+import { getConfig } from '../helpers/handleHeader'
+import { getToken } from '../utils/localStorage'
 
 const { REACT_APP_API_URL } = process.env
 
@@ -9,6 +12,7 @@ export {
   login,
   logout,
   getUser,
+  isJwtExpired,
 }
 
 /**
@@ -20,32 +24,14 @@ export {
  */
 
 function register (name, email, password) {
-  let myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    "name": name,
-    "email": email,
-    "password": password
-  });
-
-  const requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/user/register`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Register successfully.`)
-        : message.error(`Register failed.`)
-    })
-    .catch(() => {
-      message.error(`Register failed.`)
-      window.location.reload()
-    });
+  return axios.post(
+    `${REACT_APP_API_URL}/user/register`,
+    {
+      'name': name,
+      "email": email,
+      "password": password,
+    }
+  )
 };
 
 /**
@@ -70,19 +56,30 @@ function login (email, password) {
  *
  */
 function logout () {
-  return axios.post(`${REACT_APP_API_URL}/user/me/logout`)
+  return axios.post(`${REACT_APP_API_URL}/user/me/logout`, {}, getConfig())
 };
 
 /**
- * AXIOS - POST - LOGOUT
+ * AXIOS - POST - GET USER
  *
  */
 function getUser () {
-  return axios.get(`${REACT_APP_API_URL}/user/me`,
-    {
-      headers: {
-        'x_authorization': getToken()
-      }
+  return axios.get(`${REACT_APP_API_URL}/user/me`, {}, getConfig())
+}
+
+/**
+ * CHECK EXPIRE OF TOKEN
+ *
+ */
+function isJwtExpired () {
+  const token = getToken() || null
+
+  if (!token) return token
+
+  jwt.verify(token, '', function (err, decoded) {
+    if (err) {
+      return true
     }
-  )
-};
+  })
+  return false
+}

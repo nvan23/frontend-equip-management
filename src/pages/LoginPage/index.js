@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 
 import { useStore } from '../../context/storeProvider';
 
@@ -23,13 +23,11 @@ import LoginForm from './LoginForm'
 
 const LoginPage = () => {
   const [{ auth }] = useStore();
-
+  const history = useHistory()
 
   useEffect(() => {
-    if (auth.user) {
-      <Redirect to={getCurrentPath()} />
-    }
-  }, [auth.user,])
+    auth.user && history.push(getCurrentPath())
+  }, [auth.user])
 
   return (
     <Row wrap={false} justify='center' align='center' gutter={[16, 16]}>

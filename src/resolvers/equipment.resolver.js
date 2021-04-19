@@ -1,253 +1,70 @@
-import { message } from "antd";
+import axios from 'axios'
 
-const { REACT_APP_API_URL } = process.env;
+import { getConfig } from '../helpers/handleHeader'
 
-const tokenString = sessionStorage.getItem('token');
-const token = JSON.parse(tokenString);
+const { REACT_APP_API_URL } = process.env
 
-export const getAllEquipmentsWithNameAndId = () => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/equipments/name-id`, requestOptions)
-    .then(response => response.json())
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.warn('error', error)
-    })
+export {
+  getAllEquipmentsWithNameAndId,
+  getAllEquipments,
+  getAllDeletedEquipments,
+  getEquipments,
+  getEquipment,
+  createEquipment,
+  editEquipment,
+  deleteEquipment,
+  restoreEquipment,
+  forceDeleteEquipment,
 }
 
-export const getAllEquipments = () => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/equipments`, requestOptions)
-    .then(response => response.json())
-    .then(data => {
-      return data.equipments
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getAllEquipmentsWithNameAndId () {
+  return axios.get(`${REACT_APP_API_URL}/equipments/name-id`, {}, getConfig())
 }
 
-export const getAllDeletedEquipments = async () => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/trash`, requestOptions)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getAllEquipments () {
+  return axios.get(`${REACT_APP_API_URL}/equipments`, {}, getConfig())
 }
 
-export const getEquipments = async () => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/user/equipments`, requestOptions)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      return data.equipments
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getAllDeletedEquipments () {
+  return axios.get(`${REACT_APP_API_URL}/trash`, {}, getConfig())
 }
 
-export const getEquipment = async (equipmentId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/equipments/${equipmentId}`, requestOptions)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getEquipments () {
+  return axios.get(`${REACT_APP_API_URL}/user/equipments`, {}, getConfig())
 }
 
-export const createEquipment = async (name, type, description) => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    "type": type,
-    "name": name,
-    "description": description,
-  });
-
-  const requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/equipments`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`${name} created successfully.`)
-        : message.error(`Cannot to create ${name}. Try again at another time.`)
-
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    });
+function getEquipment (equipmentId) {
+  return axios.get(`${REACT_APP_API_URL}/equipments/${equipmentId}`, {}, getConfig())
 }
 
-export const editEquipment = async (equipmentId, name, type, description) => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    "type": type,
-    "name": name,
-    "description": description,
-  });
-
-  const requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/equipments/${equipmentId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`${name} edited successfully.`)
-        : message.error(`Failed to edit ${name}.`)
-
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    });
+function createEquipment (name, type, description) {
+  return axios.post(`${REACT_APP_API_URL}/equipments`,
+    {
+      "type": type,
+      "name": name,
+      "description": description,
+    },
+    getConfig()
+  )
 }
 
-export const deleteEquipment = async (equipmentId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'DELETE',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/equipments/${equipmentId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Delete successfully.`)
-        : message.error(`Failed to delete.`)
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function editEquipment (equipmentId, name, type, description) {
+  return axios.put(`${REACT_APP_API_URL}/equipments/${equipmentId}`,
+    {
+      "type": type,
+      "name": name,
+      "description": description,
+    }, getConfig())
 }
 
-export const restoreEquipment = async (equipmentId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/trash/${equipmentId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Restore successfully.`)
-        : message.error(`Failed to restore.`)
-      return response.json()
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function deleteEquipment (equipmentId) {
+  return axios.delete(`${REACT_APP_API_URL}/equipments/${equipmentId}`, {}, getConfig())
 }
 
-export const forceDeleteEquipment = async (equipmentId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
+function restoreEquipment (equipmentId) {
+  return axios.put(`${REACT_APP_API_URL}/trash/${equipmentId}`, {}, getConfig())
+}
 
-  const requestOptions = {
-    method: 'DELETE',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/trash/${equipmentId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Remove equipment successfully.`)
-        : message.error(`Failed to remove.`)
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function forceDeleteEquipment (equipmentId) {
+  return axios.delete(`${REACT_APP_API_URL}/trash/${equipmentId}`, {}, getConfig())
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, Redirect, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
@@ -13,6 +13,7 @@ import Container from 'react-bootstrap/Container'
 import { logout } from '../resolvers/auth.resolver'
 import { REMOVE_USER } from '../context/auth'
 import { useStore } from '../context/storeProvider';
+import { removeToken } from '../utils/localStorage'
 
 const { SubMenu } = Menu;
 
@@ -44,16 +45,17 @@ const Nav = ({ user }) => {
   const history = useHistory()
   const [{ auth }, dispatch] = useStore();
 
-  const handleLogout = () => {
+  function handleLogout () {
     logout()
-      .then(() => {
-        message.success('Logged out successfully')
-        history.push('/login')
+      .then(response => {
         dispatch({
           type: REMOVE_USER,
         })
+        removeToken()
+        message.success('Logged out successfully')
+        return < Redirect to='/' />
       })
-      .catch(() => {
+      .catch(error => {
         message.error('Failed to log out')
       })
   }

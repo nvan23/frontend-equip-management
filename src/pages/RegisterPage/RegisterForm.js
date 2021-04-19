@@ -1,5 +1,5 @@
-import React, { useHistory } from 'react'
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link, useHistory } from 'react-router-dom';
 
 import { register } from '../../resolvers/auth.resolver'
 
@@ -29,8 +29,10 @@ const RegisterForm = () => {
         message.success('Register successfully')
         history.push('/login')
       })
-      .catch(() => {
-        message.error('Failed to register')
+      .catch((error) => {
+        error.response.status === 406
+          ? message.error(error.response.data.msg)
+          : message.error('Failed to register')
       })
   };
 

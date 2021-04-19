@@ -4,7 +4,7 @@ const isAuth = () => {
   const tokenString = sessionStorage.getItem('token');
   const token = JSON.parse(tokenString);
   let myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
+  myHeaders.append("x-access-token", token);
 
   const requestOptions = {
     method: 'GET',

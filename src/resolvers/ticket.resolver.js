@@ -1,240 +1,62 @@
-import { message } from "antd";
+import axios from 'axios'
 
-const { REACT_APP_API_URL } = process.env;
+import { getConfig } from '../helpers/handleHeader'
 
-const tokenString = sessionStorage.getItem('token');
-const token = JSON.parse(tokenString);
+const { REACT_APP_API_URL } = process.env
 
-export const getAllTickets = () => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return new Promise((resolve, reject) => {
-    fetch(`${REACT_APP_API_URL}/tickets`, requestOptions)
-      .then(response => {
-        if (response.status === 400) {
-          return reject("Bad request")
-        }
-        response.json()
-      })
-      .then(data => {
-        resolve(data)
-      })
-      .catch(error => {
-        reject(error)
-      })
-  })
+export {
+  getAllTickets,
+  getAllDeletedTickets,
+  getTickets,
+  getTicket,
+  createTicket,
+  editTicket,
+  deleteTicket,
+  restoreTicket,
+  forceDeleteTicket,
 }
 
-export const getAllDeletedTickets = async () => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/tickets/trash/`, requestOptions)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getAllTickets () {
+  return axios.get(`${REACT_APP_API_URL}/tickets`, {}, getConfig())
 }
 
-export const getTickets = async () => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/user/tickets`, requestOptions)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      return data.equipments
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getAllDeletedTickets () {
+  return axios.get(`${REACT_APP_API_URL}/tickets/trash/`, {}, getConfig())
 }
 
-export const getTicket = async (ticketId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/tickets/${ticketId}`, requestOptions)
-    .then(response => {
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function getTickets () {
+  return axios.get(`${REACT_APP_API_URL}/user/tickets`, {}, getConfig())
 }
 
-export const createTicket = (userId, equipmentId) => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    "userId": userId,
-    "equipmentId": equipmentId,
-  });
-
-  const requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/tickets`, requestOptions)
-    .then(response => {
-      if (!response.ok) {
-        throw Error(response);
-      }
-      return response.json()
-    })
-    .then(data => {
-      message.success(`Ticket created successfully.`)
-      return data
-    })
-    .catch(error => {
-      message.error(`Cannot to create. Try again at another time.${error.toString()}`)
-      console.warn('error', error)
-    })
+function getTicket (ticketId) {
+  return axios.get(`${REACT_APP_API_URL}/tickets/${ticketId}`, {}, getConfig())
 }
 
-export const editTicket = async (ticketId, name, type, description) => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-  myHeaders.append("Content-Type", "application/json");
-
-  const raw = JSON.stringify({
-    "type": type,
-    "name": name,
-    "description": description,
-  });
-
-  const requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
-  };
-
-  return await fetch(`${REACT_APP_API_URL}/tickets/${ticketId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`${name} edited successfully.`)
-        : message.error(`Failed to edit ${name}.`)
-
-      return response.json()
-    })
-    .then(data => {
-      return data
-    })
-    .catch(error => {
-      console.log('error', error)
-    });
+function createTicket (userId, equipmentId) {
+  return axios.post(`${REACT_APP_API_URL}/tickets`,
+    {
+      "userId": userId,
+      "equipmentId": equipmentId,
+    }, getConfig())
 }
 
-export const deleteTicket = (ticketId) => {
-  const myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'DELETE',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/tickets/${ticketId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Delete successfully.`)
-        : message.error(`Failed to delete.`)
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function editTicket (ticketId, name, type, description) {
+  return axios.put(`${REACT_APP_API_URL}/tickets/${ticketId}`,
+    {
+      "type": type,
+      "name": name,
+      "description": description,
+    }, getConfig())
 }
 
-export const restoreTicket = (ticketId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
-
-  const requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/tickets/trash/${ticketId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Restore successfully.`)
-        : message.error(`Failed to restore.`)
-      return response.json()
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function deleteTicket (ticketId) {
+  return axios.delete(`${REACT_APP_API_URL}/tickets/${ticketId}`, {}, getConfig())
 }
 
-export const forceDeleteTicket = (ticketId) => {
-  var myHeaders = new Headers();
-  myHeaders.append("x_authorization", token);
+function restoreTicket (ticketId) {
+  return axios.put(`${REACT_APP_API_URL}/tickets/trash/${ticketId}`, {}, getConfig())
+}
 
-  const requestOptions = {
-    method: 'DELETE',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  return fetch(`${REACT_APP_API_URL}/tickets/trash/${ticketId}`, requestOptions)
-    .then(response => {
-      response.ok
-        ? message.success(`Remove equipment successfully.`)
-        : message.error(`Failed to remove.`)
-    })
-    .then(() => {
-      window.location.reload()
-    })
-    .catch(error => {
-      console.log('error', error)
-    })
+function forceDeleteTicket (ticketId) {
+  return axios.delete(`${REACT_APP_API_URL}/tickets/trash/${ticketId}`, {}, getConfig())
 }
