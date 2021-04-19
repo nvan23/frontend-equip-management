@@ -11,8 +11,8 @@ const storeContext = createContext();
  * Combine initial states
  */
 const store = {
-  equip: equipInitialState,
   auth: authInitialState,
+  equip: equipInitialState,
 };
 
 /**

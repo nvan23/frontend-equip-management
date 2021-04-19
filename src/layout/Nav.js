@@ -13,7 +13,10 @@ import Container from 'react-bootstrap/Container'
 import { logout } from '../resolvers/auth.resolver'
 import { REMOVE_USER } from '../context/auth'
 import { useStore } from '../context/storeProvider';
-import { removeToken } from '../utils/localStorage'
+import {
+  removeToken,
+  removeRefreshToken,
+} from '../utils/localStorage'
 
 const { SubMenu } = Menu;
 
@@ -51,6 +54,7 @@ const Nav = ({ user }) => {
         dispatch({
           type: REMOVE_USER,
         })
+        removeRefreshToken()
         removeToken()
         message.success('Logged out successfully')
         return < Redirect to='/' />

@@ -56,7 +56,7 @@ function login (email, password) {
  *
  */
 function logout () {
-  return axios.post(`${REACT_APP_API_URL}/user/me/logout`, {}, getConfig())
+  return axios.post(`${REACT_APP_API_URL}/user/me/logout`)
 };
 
 /**
@@ -64,7 +64,7 @@ function logout () {
  *
  */
 function getUser () {
-  return axios.get(`${REACT_APP_API_URL}/user/me`, {}, getConfig())
+  return axios.get(`${REACT_APP_API_URL}/user/me`)
 }
 
 /**
@@ -74,7 +74,7 @@ function getUser () {
 function isJwtExpired () {
   const token = getToken() || null
 
-  if (!token) return token
+  if (!token) return false
 
   jwt.verify(token, '', function (err, decoded) {
     if (err) {

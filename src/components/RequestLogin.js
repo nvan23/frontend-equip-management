@@ -23,7 +23,7 @@ const RequestLogin = () => {
   }
   const handleCancel = () => {
     setVisible(false)
-    removeToken();
+    removeToken()
     window.location = '/'
   }
 

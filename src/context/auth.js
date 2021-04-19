@@ -1,4 +1,5 @@
 import { getToken } from '../utils/localStorage'
+import { isJwtExpired, getUser } from '../resolvers/auth.resolver'
 
 /**
  * Actions types
@@ -6,6 +7,16 @@ import { getToken } from '../utils/localStorage'
 export const SET_USER = 'SET_USER';
 export const REMOVE_USER = 'REMOVE_USER';
 export const LOGIN = 'LOGIN';
+
+// const _getUser = async () => {
+//   let user = { null };
+//   try {
+//     user = await getUser()
+//   } catch (err) {
+//     //Todo
+//   }
+//   return user
+// }
 
 /**
  * Initial State
@@ -26,7 +37,6 @@ export function authReducer (state, action) {
 
     case REMOVE_USER:
       return {
-        ...state,
         user: null,
         token: null,
       }

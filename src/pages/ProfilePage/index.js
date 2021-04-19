@@ -1,8 +1,11 @@
 import React from 'react'
 import { Result, Button, Image, Avatar } from 'antd'
 import { useStore } from '../../context/storeProvider'
+import { applyInterceptors } from '../../services/axios'
+
 
 const ProfilePage = () => {
+  applyInterceptors()
   const [{ auth }] = useStore()
 
   const name = auth.user.name || 'Successfully Purchased Cloud Server ECS!'

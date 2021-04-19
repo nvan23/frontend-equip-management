@@ -48,13 +48,14 @@ const AppLayout = () => {
       return <RequestLogin />
 
     } else {
+      const token = getToken()
       getUser()
         .then(response => {
           dispatch({
             type: SET_USER,
             payload: {
               user: response.data,
-              token: getToken()
+              token: token
             }
           });
         })
